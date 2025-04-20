@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"time"
 )
@@ -12,24 +13,39 @@ import (
 const (
 	host     = "localhost"
 	port     = 5432
-	database = "sample"
+	database = "syntheki"
 	user     = "developer"
 	password = "XUQ2As8z"
 )
 
+func ValidatePassword(hashedPwd, plainPwd string) bool {
+	if hashedPwd != "" && plainPwd != "" {
+		err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(plainPwd))
+		CheckError(err)
+		return err == nil
+	} else {
+		return false
+	}
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
+}
+
 func GetDbConnection() (*sql.DB, error) {
 	connString := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, database)
 
-	fmt.Println("## Obtaining connection...")
+	fmt.Println("#### Obtaining connection...")
 	db, err := sql.Open("postgres", connString)
 	CheckError(err)
 
-	fmt.Println("## Attempting to ping...")
+	fmt.Println("### Attempting to ping...")
 	err = db.Ping()
 	CheckError(err)
 	fmt.Println("## Connected!")
 
-	fmt.Println("## Selecting schema...")
+	fmt.Println("# Selecting schema...")
 	_, err = db.Exec(`SET search_path TO development`)
 	CheckError(err)
 

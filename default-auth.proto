@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package auth;//TODO Always update with your project package directory
+
+//option java_multiple_files = true;
+//option java_package = "com.puumcore.syntheki.iam.services.auth";//TODO Always update with your project package directory
+//option java_outer_classname = "DefaultAuthProto";
+
+option go_package = "iam/auth";
+
+service DefaultAuthenticationService {
+
+    rpc Authenticate (AuthReq) returns (StandardResponse) {
+    }
+
+    rpc Login (LoginReq) returns (StandardResponse) {
+    }
+
+    rpc RequestPasswordReset (UserReq) returns (StandardResponse) {
+    }
+
+    rpc ValidatePasswordReset (ResetValidatorReq) returns (StandardResponse) {
+    }
+
+    rpc PasswordReset (ResetReq) returns (StandardResponse) {
+    }
+
+    rpc Logout(UserReq) returns (StandardResponse) {
+    }
+
+}
+
+message LoginReq {
+    string channel = 1;
+    string username = 2;
+    int32 otp = 3;
+}
+
+message AuthReq {
+    string channel = 1;
+    string username = 2;
+    string password = 3;
+}
+
+message UserReq {
+    string channel = 1;
+    string username = 2;
+}
+
+message ResetValidatorReq {
+    string channel = 1;
+    string token = 2;
+}
+
+message ResetReq {
+    string channel = 1;
+    string token = 2;
+    string password = 3;
+}
+
+message StandardResponse {
+    uint32 code = 1;
+    string message = 2;
+}
