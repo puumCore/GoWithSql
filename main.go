@@ -16,8 +16,14 @@ func main() {
 		repository.CheckError(err)
 	}(connection)
 
-	printUsers(connection)
+	go printUsers(connection)
+	mq()
 	gRPCServer()
+}
+
+func mq() {
+	_, err := getMqConnection()
+	checkError(err)
 }
 
 func checkError(e error) {
