@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -21,7 +20,6 @@ const (
 func ValidatePassword(hashedPwd, plainPwd string) bool {
 	if hashedPwd != "" && plainPwd != "" {
 		err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(plainPwd))
-		CheckError(err)
 		return err == nil
 	} else {
 		return false
@@ -80,6 +78,7 @@ func UpdateUser(db *sql.DB, newName string, id int64) bool {
 	return affected > 0
 }
 
+// GetUsers My method taking db connection as its parameter and a list of users as its return type
 func GetUsers(db *sql.DB) []User {
 	row, err := db.Query(`SELECT customer_id, created_at, full_name, phone, email, kra_pin, username, "password" FROM default_users order by customer_id desc`)
 	CheckError(err)
@@ -98,18 +97,7 @@ func GetUsers(db *sql.DB) []User {
 	return users
 }
 
-func ToJson(users []User) string {
-	marshaled, err := json.MarshalIndent(users, "", " ")
-	CheckError(err)
-	return string(marshaled)
-}
-
-func ToJsonAlt(u User) string {
-	marshaled, err := json.MarshalIndent(u, "", " ")
-	CheckError(err)
-	return string(marshaled)
-}
-
+// User my pojo
 type User struct {
 	Id                 int64
 	CreatedAt          time.Time
@@ -118,6 +106,7 @@ type User struct {
 	Username, Password string
 }
 
+// CheckError My exception handler
 func CheckError(e error) {
 	if e != nil {
 		log.Fatal(e)
