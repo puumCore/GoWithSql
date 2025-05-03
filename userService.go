@@ -7,7 +7,14 @@ import (
 	"go_with_sql/repository"
 )
 
-func printUsers(connection *sql.DB) {
+func printUsers() {
+	connection, err := repository.GetDbConnection()
+	checkError(err)
+	defer func(connection *sql.DB) {
+		err := connection.Close()
+		repository.CheckError(err)
+	}(connection)
+
 	users := repository.GetUsers(connection)
 	data := ToJson(users)
 	fmt.Printf("#### All > %s\n", data)
